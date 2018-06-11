@@ -1,27 +1,121 @@
-extends layout
+extends ./layout
 
 block content
-  h1 Hackathon Starter
-  p.lead A boilerplate for Node.js web applications.
-  hr
-  .row
-    .col-md-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-raised(href='#', role='button') View details »
-    .col-md-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-raised(href='#', role='button') View details »
-    .col-md-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-raised(href='#', role='button') View details »
-    .col-md-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-raised(href='#', role='button') View details »
+  style.
+    #map {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      top: 0px;
+      left: 0px;
+    }
+
+    .map-container {
+      position: absolute;
+      width: 100%;
+      left: 0px;
+      top: 67.5px;
+    }
+
+    #pac-input {
+      width: 300px;
+      border-radius: 5px;
+      border: none;
+      padding-left: 10px;
+      height: 40px;
+      background-color: #e9e9e9;
+    }
+
+    #pac-container {
+      z-index: 20;
+    }
+
+  .map-container
+    input#pac-input(class="controls" type="text" placeholder="Search for Your Ramp")
+    #map
+
+block append footer
+  script(src='/js/mapUtils.js')
+  script.
+    var map;
+
+    function initAutocomplete() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 13,
+        mapTypeId: 'roadmap'
+      });
+
+      // Create the search box and link it to the UI element.
+      var input = document.getElementById('pac-input');
+      var searchBox = new google.maps.places.SearchBox(input);
+
+      // Bias the SearchBox results towards current map's viewport.
+      map.addListener('bounds_changed', function() {
+        searchBox.setBounds(map.getBounds());
+      });
+
+      var markers = [];
+      // Listen for the event fired when the user selects a prediction and retrieve
+      // more details for that place.
+      searchBox.addListener('places_changed', function() {
+        var places = searchBox.getPlaces();
+
+        if (places.length == 0) {
+          return;
+        }
+
+        // Clear out the old markers.
+        markers.forEach(function(marker) {
+          marker.setMap(null);
+        });
+        markers = [];
+
+        // For each place, get the icon, name and location.
+        var bounds = new google.maps.LatLngBounds();
+        places.forEach(function(place) {
+          if (!place.geometry) {
+            console.log("Returned place contains no geometry");
+            return;
+          }
+          var icon = {
+            url: place.icon,
+            size: new google.maps.Size(71, 71),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(17, 34),
+            scaledSize: new google.maps.Size(25, 25)
+          };
+
+          // Create a marker for each place.
+          markers.push(new google.maps.Marker({
+            map: map,
+            icon: icon,
+            title: place.name,
+            position: place.geometry.location
+          }));
+
+          if (place.geometry.viewport) {
+            // Only geocodes have viewport.
+            bounds.union(place.geometry.viewport);
+          } else {
+            bounds.extend(place.geometry.location);
+          }
+        });
+        map.fitBounds(bounds);
+      });
+    }
+
+    function resizeMap() {
+      var height = $(window).height() - 67.5;
+      $('.map-container').css({height: height});
+    }
+
+    $(document).ready(function() {
+      setMapCenter(map);
+      resizeMap();
+      $('.searchbox-container').append($('#pac-input'));
+      $(window).resize(function() {
+        resizeMap();
+      });
+    });
+
+  script(async defer src=`https://maps.googleapis.com/maps/api/js?key=${google_map_api_key}&libraries=places&callback=initAutocomplete`)
