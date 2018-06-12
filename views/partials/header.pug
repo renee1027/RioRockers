@@ -6,9 +6,14 @@
       span.sr-only Toggle navigation
       span.navbar-toggler-icon
     .collapse.navbar-collapse
-      ul.nav.navbar-nav.ml-auto
-        .searchbox-container
+      ul.nav.navbar-nav
+        li.nav-item(class=(title === 'Scan Ramp') ? 'active' : undefined)
+          a.nav-link.text-center(href='/')
+            i.fas.fa-qrcode
+            | Scan Ramp
         li.nav-item(class=(title === 'My Ramps') ? 'active' : undefined)
-          a.nav-link(href='/')
+          a.nav-link.text-center(href='/')
             i.fas.fa-map-marker-alt
             | My Ramps
+      ul.nav.navbar-nav.ml-auto
+        .searchbox-container
