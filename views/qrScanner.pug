@@ -1,0 +1,11 @@
+extends ./layout
+
+block content
+    video#qrScanner
+
+block append footer
+  script(src='/js/lib/instascan.min.js')
+  script.
+    $(document).ready(function(){
+        initQrScanner();
+    })

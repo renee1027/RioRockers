@@ -16,3 +16,9 @@ exports.index = (req, res) => {
     throw new Error(err);
   })
 };
+
+exports.qrScanner = (req, res) => {
+  res.render('qrScanner', {
+      title: 'Scan QR Code Located on Ramp'
+  });
+};
