@@ -38,6 +38,7 @@ dotenv.load({ path: '.env' });
  * Controllers (route handlers).
  */
 const homeController = require('./controllers/home');
+const rampController = require('./controllers/ramp');
 // const userController = require('./controllers/user');
 // const apiController = require('./controllers/api');
 const contactController = require('./controllers/contact');
@@ -138,6 +139,9 @@ app.get('/qrScanner', homeController.qrScanner);
 // app.post('/signup', userController.postSignup);
 app.get('/contact', contactController.getContact);
 app.post('/contact', contactController.postContact);
+
+app.post('/occupyRamp/:id', rampController.occupyRamp);
+app.get('/rampOccupied/:id', rampController.rampOccupied);
 
 /**
  * OAuth authentication routes. (Sign in)

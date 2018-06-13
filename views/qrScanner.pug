@@ -1,11 +1,47 @@
 extends ./layout
 
 block content
-    video#qrScanner
+    #loader
+    .qrScannerContainer
+        h3.text-center.title At the ramp?
+        canvas#qrScanner
+        #output
+            #outputMessage
+            span#outputData
 
 block append footer
-  script(src='/js/lib/instascan.min.js')
+  script(src='/js/lib/jsQR.js')
   script.
+    var codeScanned = false;
     $(document).ready(function(){
         initQrScanner();
+        $('#qrScanner').on('scanned', function(event, data) {
+            event.stopImmediatePropagation();
+            let csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            let rampId = false;
+            try {
+                rampId = JSON.parse(data).id;
+            } catch(error) {
+                console.log('not object')
+            }
+            if (rampId) {
+                $.ajax({
+                    url: '/occupyRamp/' + rampId,
+                    type: 'POST',
+                    crossDomain: true,
+                    data: { _csrf : csrftoken },
+                    success: function() {
+                        $('#qrScanner').off('scanned');
+                        codeScanned = true;
+                        window.location = '/rampOccupied/' + rampId;
+                    }
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status == 302) {
+                        console.log('Ramp already occupied');
+                    } else {
+                        throw new Error('Code not valid');
+                    }
+                })
+            }   
+        });
     })
