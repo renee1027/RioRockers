@@ -1,0 +1,176 @@
+body {
+    font-family: "Roboto", "Helvetica Neue", Arial, sans-serif !important;
+}
+
+.navbar > .container {
+    max-width: 80% !important;
+}
+
+.container {
+    width: 100%;
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+}
+
+@media (min-width: 1200px) {
+    .container {
+        max-width: 2000px !important; 
+    } 
+}
+
+.truqr-logo {
+    width: 100px;
+    height: auto;
+}
+
+.collapse.show .searchbox-container {
+    margin-bottom: 20px;
+}
+
+.fixed-top {
+    z-index: 10 !important;
+}
+
+.qrScannerContainer {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#qrScanner {
+    width: 100%;
+    height: 100%;
+    display: block;
+    margin: 0 auto;
+}
+
+#cameraLoader {
+    height: 300px;
+    width: 300px;
+    margin: 0 auto
+}
+
+#loader {
+    animation: animate 1.5s linear infinite;
+    clip: rect(0, 80px, 80px, 40px);
+    height: 80px;
+    width: 80px;
+    z-index: 10;
+    position: absolute;
+    left: calc(50% - 40px);
+    top: calc(50% - 40px);
+    color: rgb(107, 216, 97);
+}
+
+@keyframes animate {
+    0% {
+        transform: rotate(0deg)
+    }
+    100% {
+        transform: rotate(220deg)
+    }
+}
+
+#loader:after {
+    animation: animate2 1.5s ease-in-out infinite;
+    clip: rect(0, 80px, 80px, 40px);
+    content: '';
+    border-radius: 50%;
+    height: 80px;
+    width: 80px;
+    position: absolute;
+}
+
+@keyframes animate2 {
+    0% {
+        box-shadow: inset rgb(107, 216, 97) 0 0 0 17px;
+        transform: rotate(-140deg);
+    }
+    50% {
+        box-shadow: inset rgb(107, 216, 97) 0 0 0 2px;
+    }
+    100% {
+        box-shadow: inset rgb(107, 216, 97) 0 0 0 17px;
+        transform: rotate(140deg);
+    }
+}
+
+.title {
+    padding-top: 30px;
+    margin-bottom: 40px;
+    color: #fff;
+    font-family: 'Courier';
+}
+
+.back-home {
+    color: #fff;
+}
+
+.back-home:hover {
+    text-decoration: none;
+    color: #fff;
+}
+
+#boxOverlay {
+    height: 340px;
+    width: 340px;
+    position: absolute;
+    left: calc(50% - 170px);
+    top: calc(60% - 170px);
+    z-index: 20;
+    border: 3px #8a4848 dotted;
+    opacity: 0.6;
+}
+
+.overlay {
+    padding-top: 80px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    opacity: 0.9
+}
+
+#outputMessage {
+    width: 200px;
+    z-index: 50;
+    position: absolute;
+    top: 80%;
+    left: calc(50% - 100px);
+}
+
+.info-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+}
+
+.font-red {
+    color: #b34343;
+}
+
+.font-dark-grey {
+    color: #787878;
+}
+
+.font-green {
+    color: rgb(107, 216, 97);
+}
+
+.dark-grey-background {
+    background-color: #1b1b1b
+}
+
+.margin-top-20 {
+    margin-top: 20px;
+}
+
+.margin-top-40 {
+    margin-top: 40px;
+}
+
+.margin-top-neg-10 {
+    margin-top: -10px;
+}

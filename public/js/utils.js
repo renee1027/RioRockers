@@ -19,6 +19,7 @@ function initQrScanner() {
   
   var video = document.createElement("video");
   var canvasElement = document.getElementById("qrScanner");
+  var boxOverlay = document.getElementById("boxOverlay");
   var canvas = canvasElement.getContext("2d");
   var loader = document.getElementById("loader");
 
@@ -48,6 +49,7 @@ function initQrScanner() {
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
       loader.hidden = true;
       canvasElement.hidden = false;
+      boxOverlay.hidden = false;
 
       canvasElement.height = video.videoHeight;
       canvasElement.width = video.videoWidth;

@@ -9,12 +9,10 @@
 
 @import "themes/default/default";
 
-@import "_custom";
-
 // Scaffolding
 // -------------------------
 
-html {
+html, body {
   position: relative;
   min-height: 100%;
 }

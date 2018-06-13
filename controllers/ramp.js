@@ -35,7 +35,8 @@ exports.rampOccupied = (req, res) => {
     }).then(function(ramp) {
         res.render('rampOccupied', {
             title: 'Ramp Occupied!',
-            ramp
+            ramp,
+            time: moment(ramp.occupiedSince).format('YYYY-MM-DD HH:mm')
         });
     }).catch(function (err) {
         console.log(err);
