@@ -1,0 +1,55 @@
+extends ./layout
+
+block content
+    #loader
+    #boxOverlay(hidden)
+    .overlay.dark-grey-background
+        a.back-home.text-center(href='/')
+            h5.text-center
+                .fas.fa-angle-left
+                | Home
+        h2.text-center.title At the ramp?
+    .qrScannerContainer
+        #outputMessage.font-red.text-center
+        canvas#qrScanner
+
+block append footer
+  script(src='/js/lib/jsQR.js')
+  script.
+    var codeScanned = false;
+    $(document).ready(function(){
+        initQrScanner();
+        $('#qrScanner').on('scanned', function(event, data) {
+            event.stopImmediatePropagation();
+            $('#outputMessage').text('');
+            if (!codeScanned) {
+                let csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                let rampId = false;
+                try {
+                    rampId = JSON.parse(data).id;
+                } catch(error) {
+                    console.log('not object')
+                }
+                if (rampId) {
+                    $.ajax({
+                        url: '/occupyRamp/' + rampId,
+                        type: 'POST',
+                        crossDomain: true,
+                        data: { _csrf : csrftoken },
+                        success: function() {
+                            $('#qrScanner').off('scanned');
+                            $('#outputMessage').text('');
+                            codeScanned = true;
+                            window.location = '/rampOccupied/' + rampId;
+                        }
+                    }).fail(function(jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.status == 302) {
+                            $('#outputMessage').text('Ramp already occupied');
+                        } else {
+                            $('#outputMessage').text('Code not valid');
+                        }
+                    })
+                }  
+            } 
+        });
+    })

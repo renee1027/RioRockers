@@ -1,0 +1,37 @@
+extends ./layout
+
+block content
+    include partials/header
+    .info-container
+        .child-containers.margin-top-neg-10
+            .check-mark-container.text-center.font-green
+                h1
+                    i.far.fa-check-circle
+                h3.margin-top-neg-10 Occupied
+            .ramp-container.text-center.margin-top-40
+                h2 #{ramp.rampNumber}
+                h6.margin-top-neg-10.font-dark-grey Ramp Number
+            .location-container.text-center.margin-top-20
+                h3 #{ramp.Location.name}
+                h6.margin-top-neg-10.font-dark-grey Location
+            .time-container.text-center.margin-top-20
+                h3 #{time}
+                h6.margin-top-neg-10.font-dark-grey Time
+            div.margin-top-40(style="width: 100%")
+                a.release-button.text-center.font-green(onclick='freeRamp(' + ramp.id + ')') Free Ramp
+
+block append footer
+  script.
+    function freeRamp(rampId) {
+        let csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        $.ajax({
+            url: '/freeRamp/' + rampId,
+            type: 'POST',
+            crossDomain: true,
+            data: { _csrf : csrftoken },
+            success: function() {
+                window.location = '/';
+            }
+        });
+    }
+    

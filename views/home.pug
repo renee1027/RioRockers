@@ -1,27 +1,186 @@
-extends layout
-
+extends ./layout
 block content
-  h1 Hackathon Starter
-  p.lead A boilerplate for Node.js web applications.
-  hr
-  .row
-    .col-md-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-raised(href='#', role='button') View details »
-    .col-md-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-raised(href='#', role='button') View details »
-    .col-md-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-raised(href='#', role='button') View details »
-    .col-md-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-raised(href='#', role='button') View details »
+  include partials/header
+  style.
+    #map {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      top: 0px;
+      left: 0px;
+    }
+
+    .map-container {
+      position: absolute;
+      width: 100%;
+      left: 0px;
+      top: 67.5px;
+    }
+
+    #pac-input {
+      width: 250px;
+      border-radius: 5px;
+      border: none;
+      padding-left: 10px;
+      height: 40px;
+      background-color: #e9e9e9;
+    }
+
+    #pac-container {
+      z-index: 20;
+    }
+
+    .searchbox-container {
+      margin: 0 auto
+    }
+
+  .map-container
+    input#pac-input(class="controls" type="search" placeholder="Search for Your Ramp")
+    #map
+    #locationRootElem(hidden)
+      .location-info-container
+        h6.location-title
+        h7.address
+    #rampRootElem(hidden)
+      .ramp-container
+        h7.rampNumber
+        .status
+          i.fas.fa-circle
+          h7
+        h7.occupiedSince
+          
+        
+
+block append footer
+  script.
+    var map;
+    var locations = !{JSON.stringify(locations)};
+
+    function generateLocationContent(locationInfo) {
+      let locationElem = $('#locationRootElem .location-info-container').clone();
+      locationElem.attr('id', 'location_' + locationInfo.id);
+      locationElem.find('.location-title').text(locationInfo.name);
+      locationElem.find('.address').text(locationInfo.address)
+      locationInfo.Ramps.map(function(ramp, index) {
+        let rampElem = $('#rampRootElem .ramp-container').clone();
+        rampElem.attr('id', 'ramp_' + ramp.id);
+        let rampNum = index + 1;
+        rampElem.find('.rampNumber').text('Ramp ' + rampNum);
+        let status = rampElem.find('.status');
+        if (ramp.occupiedSince) {
+          status.addClass('font-bright-red');
+          status.find('h7').text('Occupied');
+          let duration = moment.duration(moment().diff(ramp.occupiedSince));
+          duration = duration.asHours().toFixed(1);
+          duration = duration == '0.0' ? 'Just Now' : 'For ' + duration + ' hours';
+          rampElem.find('.occupiedSince').text(duration);
+        } else {
+          status.addClass('font-green');
+          status.find('h7').text('Free');
+        }
+        rampElem.appendTo(locationElem);
+      });
+      return locationElem.html();
+    }
+
+    function initAutocomplete() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 13,
+        mapTypeId: 'roadmap'
+      });
+
+      // Create the search box and link it to the UI element.
+      var input = document.getElementById('pac-input');
+      var searchBox = new google.maps.places.SearchBox(input);
+
+      // Bias the SearchBox results towards current map's viewport.
+      map.addListener('bounds_changed', function() {
+        searchBox.setBounds(map.getBounds());
+      });
+
+      var locationMarker;
+      var locationInfoWindow;
+
+      locations.map(function(location) {
+        locationMarker = new google.maps.Marker({
+          position: {lat: location.lat, lng: location.lng},
+          map: map,
+          title: location.name
+        });
+
+        locationInfoWindow = new google.maps.InfoWindow({
+          content: generateLocationContent(location),
+          backgroundColor: 'rgba(62, 62, 62, 0.9)',
+          borderWidth: 0
+        });
+
+        locationMarker.addListener('click', function() {
+          locationInfoWindow.open(map, locationMarker);
+        });
+      })
+
+      var markers = [];
+      // Listen for the event fired when the user selects a prediction and retrieve
+      // more details for that place.
+      searchBox.addListener('places_changed', function() {
+        var places = searchBox.getPlaces();
+
+        if (places.length == 0) {
+          return;
+        }
+
+        // Clear out the old markers.
+        markers.forEach(function(marker) {
+          marker.setMap(null);
+        });
+        markers = [];
+
+        // For each place, get the icon, name and location.
+        var bounds = new google.maps.LatLngBounds();
+        places.forEach(function(place) {
+          if (!place.geometry) {
+            console.log("Returned place contains no geometry");
+            return;
+          }
+          var icon = {
+            url: place.icon,
+            size: new google.maps.Size(71, 71),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(17, 34),
+            scaledSize: new google.maps.Size(25, 25)
+          };
+
+          // Create a marker for each place.
+          markers.push(new google.maps.Marker({
+            map: map,
+            icon: icon,
+            title: place.name,
+            position: place.geometry.location
+          }));
+
+          if (place.geometry.viewport) {
+            // Only geocodes have viewport.
+            bounds.union(place.geometry.viewport);
+          } else {
+            bounds.extend(place.geometry.location);
+          }
+        });
+        map.fitBounds(bounds);
+      });
+    }
+
+    function resizeMap() {
+      var height = $(window).height() - 67.5;
+      $('.map-container').css({height: height});
+    }
+
+    $(document).ready(function() {
+      setMapCenter(map);
+      resizeMap();
+      $('.searchbox-container').append($('#pac-input'));
+      $(window).resize(function() {
+        resizeMap();
+      });
+    });
+
+  script(async defer src=`https://maps.googleapis.com/maps/api/js?key=${google_map_api_key}&libraries=places&callback=initAutocomplete`)
