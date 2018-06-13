@@ -118,7 +118,7 @@ body {
     left: calc(50% - 170px);
     top: calc(60% - 170px);
     z-index: 20;
-    border: 3px #8a4848 dotted;
+    border: 3px #e15656 dotted;
     opacity: 0.6;
 }
 
@@ -147,6 +147,35 @@ body {
     height: 100vh;
 }
 
+.release-button {
+    height: 50px;
+    width: 250px;
+    padding: 10px 20px;
+    border: 2px #76c946 solid;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+}
+
+.release-button:hover {
+    background-color: #76c946;
+    color: #fff !important;
+}
+
+.ramp-container > h6, .ramp-container > h7 {
+    display: block;
+    line-height: 1.5;
+}
+
+.rampNumber {
+    font-weight: bold;
+    padding-top: 5px;
+}
+
+.font-bright-red {
+    color: #fb665b;
+}
+
 .font-red {
     color: #b34343;
 }
@@ -156,7 +185,7 @@ body {
 }
 
 .font-green {
-    color: rgb(107, 216, 97);
+    color: rgb(118, 201, 70) !important;
 }
 
 .dark-grey-background {

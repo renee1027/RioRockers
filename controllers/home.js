@@ -4,7 +4,9 @@
  */
 const db = require('../models');
 exports.index = (req, res) => {
-  db.Location.findAll().then(function(locations) {
+  db.Location.findAll({
+    include: [db.Ramp]
+  }).then(function(locations) {
     res.render('home', {
       title: 'TRUQR',
       locations,

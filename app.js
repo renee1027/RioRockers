@@ -141,6 +141,7 @@ app.get('/contact', contactController.getContact);
 app.post('/contact', contactController.postContact);
 
 app.post('/occupyRamp/:id', rampController.occupyRamp);
+app.post('/freeRamp/:id', rampController.freeRamp);
 app.get('/rampOccupied/:id', rampController.rampOccupied);
 
 /**

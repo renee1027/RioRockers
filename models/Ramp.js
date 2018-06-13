@@ -12,8 +12,12 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             defaultValue: 1
         },
-        coordinates: {
-            type: DataTypes.GEOMETRY('POINT'),
+        lat: {
+            type: DataTypes.FLOAT(10, 6),
+            allowNull: false
+        },
+        lng: {
+            type: DataTypes.FLOAT(10, 6),
             allowNull: false
         },
         occupiedSince: {

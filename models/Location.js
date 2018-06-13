@@ -10,6 +10,14 @@ module.exports = function (sequelize, DataTypes) {
         name: {
             type: DataTypes.STRING
         },
+        lat: {
+            type: DataTypes.FLOAT(10, 6),
+            allowNull: false
+        },
+        lng: {
+            type: DataTypes.FLOAT(10, 6),
+            allowNull: false
+        },
         address: {
             type: DataTypes.STRING
         }

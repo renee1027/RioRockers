@@ -43,3 +43,23 @@ exports.rampOccupied = (req, res) => {
         throw new Error(err);
     })
 }
+
+exports.freeRamp = (req, res) => {
+    return db.Ramp.findById(req.params.id).then(function(ramp) {
+        if (ramp.occupiedSince) {
+            return ramp.update({
+                occupiedSince: null
+            }).then(function() {
+                res.status(200);
+            });
+        } else {
+            res.status(302);
+        }
+    }).catch(function (err) {
+        res.status(500)
+        console.log(err);
+        throw new Error(err);
+    }).finally(function() {
+        res.send();
+    })
+}
