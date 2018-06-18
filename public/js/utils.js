@@ -1,27 +1,159 @@
 'use strict'
 
-function setMapCenter(map) {
-    try {
-        navigator.geolocation.getCurrentPosition(function (position) {
-            let pos = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            };
+var map;
 
-            map.setCenter(pos);
-        });
-    } catch (error) {
-        throw new Error(error);
+function generateLocationContent(locationInfo) {
+  let locationElem = $('#locationRootElem .location-info-container').clone();
+  locationElem.attr('id', 'location_' + locationInfo.id);
+  locationElem.find('.location-title').text(locationInfo.name);
+  locationElem.find('.address').text(locationInfo.address)
+  locationInfo.Ramps.map(function (ramp, index) {
+    let rampElem = $('#rampRootElem .ramp-container').clone();
+    rampElem.attr('id', 'ramp_' + ramp.id);
+    let rampNum = index + 1;
+    rampElem.find('.rampNumber').text('Ramp ' + rampNum);
+    let status = rampElem.find('.status');
+    if (ramp.occupiedSince) {
+      status.addClass('font-bright-red');
+      status.find('h7').text('Occupied');
+      let duration = moment.duration(moment().diff(ramp.occupiedSince));
+      duration = duration.asHours().toFixed(1);
+      duration = duration == '0.0' ? 'Just Now' : 'For ' + duration + ' hours';
+      rampElem.find('.occupiedSince').text(duration);
+    } else {
+      status.addClass('font-green');
+      status.find('h7').text('Free');
     }
+    rampElem.appendTo(locationElem);
+  });
+  return locationElem.html();
+}
+
+function initAutocomplete() {
+  map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 13,
+    mapTypeId: 'roadmap'
+  });
+
+  // Create the search box and link it to the UI element.
+  let input = document.getElementById('pac-input');
+  let searchBox = new google.maps.places.SearchBox(input);
+
+  // Bias the SearchBox results towards current map's viewport.
+  map.addListener('bounds_changed', function () {
+    searchBox.setBounds(map.getBounds());
+  });
+
+  let locationMarker;
+  let locationInfoWindow;
+  let content;
+
+  locations.map(function (location) {
+    content = generateLocationContent(location);
+    locationMarker = new google.maps.Marker({
+      position: {
+        lat: location.lat,
+        lng: location.lng
+      },
+      map: map,
+      title: location.name
+    });
+
+    locationInfoWindow = new google.maps.InfoWindow({
+      backgroundColor: 'rgba(62, 62, 62, 0.9)',
+      borderWidth: 0
+    });
+
+    google.maps.event.addListener(locationMarker, 'click', (function (marker, content, locationInfoWindow) {
+      return function () {
+        locationInfoWindow.setContent(content);
+        locationInfoWindow.open(map, this);
+      };
+    })(locationMarker, content, locationInfoWindow));
+  })
+
+  let markers = [];
+  // Listen for the event fired when the user selects a prediction and retrieve
+  // more details for that place.
+  searchBox.addListener('places_changed', function () {
+    let places = searchBox.getPlaces();
+
+    if (places.length == 0) {
+      return;
+    }
+
+    // Clear out the old markers.
+    markers.forEach(function (marker) {
+      marker.setMap(null);
+    });
+    markers = [];
+
+    // For each place, get the icon, name and location.
+    let bounds = new google.maps.LatLngBounds();
+    places.forEach(function (place) {
+      if (!place.geometry) {
+        console.log("Returned place contains no geometry");
+        return;
+      }
+      let icon = {
+        url: place.icon,
+        size: new google.maps.Size(71, 71),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(17, 34),
+        scaledSize: new google.maps.Size(25, 25)
+      };
+
+      // Create a marker for each place.
+      markers.push(new google.maps.Marker({
+        map: map,
+        icon: icon,
+        title: place.name,
+        position: place.geometry.location
+      }));
+
+      if (place.geometry.viewport) {
+        // Only geocodes have viewport.
+        bounds.union(place.geometry.viewport);
+      } else {
+        bounds.extend(place.geometry.location);
+      }
+    });
+    map.fitBounds(bounds);
+  });
+
+  setMapCenter(map);
+  resizeMap();
+}
+
+function resizeMap() {
+  let height = $(window).height() - 67.5;
+  $('.map-container').css({
+    height: height
+  });
+}
+
+function setMapCenter(map) {
+  try {
+    navigator.geolocation.getCurrentPosition(function (position) {
+      let pos = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      };
+
+      map.setCenter(pos);
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
 }
 
 function initQrScanner() {
-  
-  var video = document.createElement("video");
-  var canvasElement = document.getElementById("qrScanner");
-  var boxOverlay = document.getElementById("boxOverlay");
-  var canvas = canvasElement.getContext("2d");
-  var loader = document.getElementById("loader");
+
+  let video = document.createElement("video");
+  let canvasElement = document.getElementById("qrScanner");
+  let boxOverlay = document.getElementById("boxOverlay");
+  let canvas = canvasElement.getContext("2d");
+  let loader = document.getElementById("loader");
 
   function drawLine(begin, end, color) {
     canvas.beginPath();
@@ -32,9 +164,15 @@ function initQrScanner() {
     canvas.stroke();
   }
 
-  let isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+  let isSafari = /constructor/i.test(window.HTMLElement) || (function (p) {
+    return p.toString() === "[object SafariRemoteNotification]";
+  })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
   // Use facingMode: environment to attemt to get the front camera on phones
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function(stream) {
+  navigator.mediaDevices.getUserMedia({
+    video: {
+      facingMode: "environment"
+    }
+  }).then(function (stream) {
     video.srcObject = stream;
     video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
     video.setAttribute("controls", isSafari);
@@ -54,8 +192,8 @@ function initQrScanner() {
       canvasElement.height = video.videoHeight;
       canvasElement.width = video.videoWidth;
       canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
-      var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
-      var code = jsQR(imageData.data, imageData.width, imageData.height);
+      let imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+      let code = jsQR(imageData.data, imageData.width, imageData.height);
       if (code && !codeScanned) {
         drawLine(code.location.topLeftCorner, code.location.topRightCorner, "#FF3B58");
         drawLine(code.location.topRightCorner, code.location.bottomRightCorner, "#FF3B58");
@@ -69,5 +207,6 @@ function initQrScanner() {
 
 }
 
-window.setMapCenter = setMapCenter;
 window.initQrScanner = initQrScanner;
+window.resizeMap = resizeMap;
+window.initAutocomplete = initAutocomplete;
