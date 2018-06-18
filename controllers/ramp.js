@@ -46,9 +46,12 @@ exports.rampOccupied = (req, res) => {
 
 exports.freeRamp = (req, res) => {
     return db.Ramp.findById(req.params.id).then(function(ramp) {
+        let duration = moment.duration(moment().diff(ramp.occupiedSince)).asHours();
+        let prevDuration = ramp.totalHoursBooked;
         if (ramp.occupiedSince) {
             return ramp.update({
-                occupiedSince: null
+                occupiedSince: null,
+                totalHoursBooked: prevDuration + duration
             }).then(function() {
                 res.status(200);
             });
