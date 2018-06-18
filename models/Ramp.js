@@ -30,7 +30,7 @@ module.exports = function (sequelize, DataTypes) {
             defaultValue: 0
         },
         totalHoursBooked: {
-            type: DataTypes.DataTypes.FLOAT(10, 4),
+            type: DataTypes.FLOAT(10, 4),
             allowNull: true,
             defaultValue: 0
         }
