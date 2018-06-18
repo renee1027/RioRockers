@@ -98,10 +98,12 @@ block append footer
         searchBox.setBounds(map.getBounds());
       });
 
-      var locationMarker;
-      var locationInfoWindow;
+      let locationMarker;
+      let locationInfoWindow;
+      let content;
 
       locations.map(function(location) {
+        content = generateLocationContent(location);
         locationMarker = new google.maps.Marker({
           position: {lat: location.lat, lng: location.lng},
           map: map,
@@ -109,14 +111,16 @@ block append footer
         });
 
         locationInfoWindow = new google.maps.InfoWindow({
-          content: generateLocationContent(location),
           backgroundColor: 'rgba(62, 62, 62, 0.9)',
           borderWidth: 0
         });
 
-        locationMarker.addListener('click', function() {
-          locationInfoWindow.open(map, locationMarker);
-        });
+        google.maps.event.addListener(locationMarker,'click', (function(marker, content, locationInfoWindow){ 
+          return function() {
+            locationInfoWindow.setContent(content);
+            locationInfoWindow.open(map, this);
+          };
+        })(locationMarker, content, locationInfoWindow));  
       })
 
       var markers = [];
