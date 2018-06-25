@@ -1,3 +1,3 @@
-![](./public/images/truqr-logo.png)
+![](./public/images/truqr-logo-slogan-top.png)
 TRUQR - From RioRockers 
 =======================
