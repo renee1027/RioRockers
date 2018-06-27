@@ -71,15 +71,11 @@ exports.freeRamp = (req, res) => {
 
 exports.addToWaitingList = (req, res) => {
     return db.Ramp.findById(req.params.id).then(function(ramp) {
-        if (ramp.occupiedSince) {
-            return ramp.update({
-                waitingList: ramp.waitingList + 1
-            }).then(function(ramp) {
-                res.status(200).send({ count: ramp.waitingList});
-            });
-        } else {
-            res.sendStatus(302);
-        }
+        return ramp.update({
+            waitingList: ramp.waitingList + 1
+        }).then(function(ramp) {
+            res.status(200).send({ count: ramp.waitingList });
+        });
     }).catch(function (err) {
         console.log(err);
         res.sendStatus(500)

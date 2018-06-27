@@ -41,6 +41,7 @@ block content
       .location-info-container
         h6.location-title
         h7.address
+        .popularityByTime
     #rampRootElem(hidden)
       .ramp-container
         h7.rampNumber
@@ -54,6 +55,8 @@ block content
         
 
 block append footer
+  script(src='/js/lib/d3.min.js' charset="utf-8")
+  script(src='/js/lib/c3-0.6.2/c3.min.js')
   script.
     var locations = !{JSON.stringify(locations)};
     let csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -65,4 +68,3 @@ block append footer
       });
     });
   script(src=`https://maps.googleapis.com/maps/api/js?key=${google_map_api_key}&libraries=places&callback=initAutocomplete`)
-  

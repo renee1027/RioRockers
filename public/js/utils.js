@@ -6,7 +6,8 @@ function generateLocationContent(locationInfo) {
   let locationElem = $('#locationRootElem .location-info-container').clone();
   locationElem.attr('id', 'location_' + locationInfo.id);
   locationElem.find('.location-title').text(locationInfo.name);
-  locationElem.find('.address').text(locationInfo.address)
+  locationElem.find('.address').text(locationInfo.address);
+  locationElem.find('.popularityByTime').attr('id', 'chart' + locationInfo.id);
   locationInfo.Ramps.map(function (ramp, index) {
     let rampElem = $('#rampRootElem .ramp-container').clone();
     rampElem.attr('id', 'ramp_' + ramp.id);
@@ -16,6 +17,7 @@ function generateLocationContent(locationInfo) {
     let waitingBtnFlag = false;
     let waitingListBtn = rampElem.find('.add-to-waiting-list')
                         .attr('onclick', 'addToWaitingList(' + ramp.id + '); return false');
+    let numPeopleWaiting = rampElem.find('.numPeopleWaiting').attr('id', 'waitingList_' + ramp.id);
     if (ramp.occupiedSince) {
       waitingBtnFlag = true;
       status.addClass('font-bright-red');
@@ -24,14 +26,13 @@ function generateLocationContent(locationInfo) {
       duration = duration.asHours().toFixed(1);
       duration = duration == '0.0' ? 'Just Now, ' : 'For ' + duration + ' hours, ';
       rampElem.find('.occupiedSince').text(duration);
-      rampElem.find('.numPeopleWaiting').attr('id', 'waitingList_' + ramp.id)
-                                        .text(ramp.waitingList + ' people waiting');
     } else {
-      waitingBtnFlag = ramp.waitingList > 0;
+      waitingBtnFlag = ramp.waitingList > 0 ? true : false;
       status.addClass('font-green');
       status.find('h7').text('Free');
     }
 
+    waitingBtnFlag && numPeopleWaiting.text(ramp.waitingList + ' people waiting');
     !waitingBtnFlag && waitingListBtn.hide();
 
     rampElem.appendTo(locationElem);
@@ -40,7 +41,6 @@ function generateLocationContent(locationInfo) {
 }
 
 function addToWaitingList(rampId) {
-  console.log('clicked');
   $.ajax({
     url: '/addToWaitingList/' + rampId,
     type: 'POST',
@@ -48,6 +48,30 @@ function addToWaitingList(rampId) {
     data: { _csrf : csrftoken },
     success: function(data) {
       $('#waitingList_' + rampId).text(data.count + ' people waiting');
+    }
+  });
+}
+
+function generateTimeBarChart(locationId) {
+  var chart = c3.generate({
+    bindto: '#chart' + locationId,
+    size: {
+      height: 200,
+      width: 200
+    },
+    data: {
+        columns: [
+            ['data1', 30, 200, 100, 400, 150, 250],
+            ['data2', 130, 100, 140, 200, 150, 50]
+        ],
+        type: 'bar'
+    },
+    bar: {
+        width: {
+            ratio: 0.5 // this makes bar width 50% of length between ticks
+        }
+        // or
+        //width: 100 // this makes bar width 100px
     }
   });
 }
@@ -91,6 +115,7 @@ function initAutocomplete() {
       return function () {
         locationInfoWindow.setContent(content);
         locationInfoWindow.open(map, this);
+        generateTimeBarChart(location.id);
       };
     })(locationMarker, content, locationInfoWindow));
   })
