@@ -33,6 +33,11 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.FLOAT(10, 4),
             allowNull: true,
             defaultValue: 0
+        },
+        waitingList: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0
         }
     });
 

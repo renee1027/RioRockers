@@ -47,13 +47,16 @@ block content
         .status
           i.fas.fa-circle
           h7
-        h7.occupiedSince
+        h7.occupiedSince(style="display: inline")
+        h7.numPeopleWaiting(style="display: inline")
+        a.add-to-waiting-list= "I'm waiting"
           
         
 
 block append footer
   script.
     var locations = !{JSON.stringify(locations)};
+    let csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
     $(document).ready(function() {
       $('.searchbox-container').append($('#pac-input'));

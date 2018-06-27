@@ -13,20 +13,43 @@ function generateLocationContent(locationInfo) {
     let rampNum = index + 1;
     rampElem.find('.rampNumber').text('Ramp ' + rampNum);
     let status = rampElem.find('.status');
+    let waitingBtnFlag = false;
+    let waitingListBtn = rampElem.find('.add-to-waiting-list')
+                        .attr('onclick', 'addToWaitingList(' + ramp.id + '); return false');
     if (ramp.occupiedSince) {
+      waitingBtnFlag = true;
       status.addClass('font-bright-red');
       status.find('h7').text('Occupied');
       let duration = moment.duration(moment().diff(ramp.occupiedSince));
       duration = duration.asHours().toFixed(1);
-      duration = duration == '0.0' ? 'Just Now' : 'For ' + duration + ' hours';
+      duration = duration == '0.0' ? 'Just Now, ' : 'For ' + duration + ' hours, ';
       rampElem.find('.occupiedSince').text(duration);
+      rampElem.find('.numPeopleWaiting').attr('id', 'waitingList_' + ramp.id)
+                                        .text(ramp.waitingList + ' people waiting');
     } else {
+      waitingBtnFlag = ramp.waitingList > 0;
       status.addClass('font-green');
       status.find('h7').text('Free');
     }
+
+    !waitingBtnFlag && waitingListBtn.hide();
+
     rampElem.appendTo(locationElem);
   });
   return locationElem.html();
+}
+
+function addToWaitingList(rampId) {
+  console.log('clicked');
+  $.ajax({
+    url: '/addToWaitingList/' + rampId,
+    type: 'POST',
+    crossDomain: true,
+    data: { _csrf : csrftoken },
+    success: function(data) {
+      $('#waitingList_' + rampId).text(data.count + ' people waiting');
+    }
+  });
 }
 
 function initAutocomplete() {

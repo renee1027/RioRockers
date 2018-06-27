@@ -7,10 +7,12 @@ const moment = require('moment');
 
 exports.occupyRamp = (req, res) => {
     return db.Ramp.findById(req.params.id).then(function (ramp) {
+        let waitingListNum = ramp.waitingList > 0 ? ramp.waitingList - 1 : 0;
         if (ramp.occupiedSince == null) {
             return ramp.update({
                 occupiedSince: moment(),
-                timesBooked: ramp.timesBooked + 1
+                timesBooked: ramp.timesBooked + 1,
+                waitingList: waitingListNum
             }).then(function () {
                 res.status(200);
             })
@@ -65,4 +67,22 @@ exports.freeRamp = (req, res) => {
     }).finally(function() {
         res.send();
     })
+}
+
+exports.addToWaitingList = (req, res) => {
+    return db.Ramp.findById(req.params.id).then(function(ramp) {
+        if (ramp.occupiedSince) {
+            return ramp.update({
+                waitingList: ramp.waitingList + 1
+            }).then(function(ramp) {
+                res.status(200).send({ count: ramp.waitingList});
+            });
+        } else {
+            res.sendStatus(302);
+        }
+    }).catch(function (err) {
+        console.log(err);
+        res.sendStatus(500)
+        throw new Error(err);
+    });
 }

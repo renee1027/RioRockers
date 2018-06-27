@@ -172,6 +172,24 @@ body {
     padding-top: 5px;
 }
 
+.add-to-waiting-list {
+    height: 20px;
+    width: 70px;
+    padding: 2px;
+    border: 1px #e15656 solid;
+    color: #e15656 !important;
+    border-radius: 2px;
+    font-size: 12px;
+    cursor: pointer;
+    display: block;
+    text-align: center;
+}
+
+.add-to-waiting-list:hover {
+    text-decoration-line: none !important;
+    color: #e15656 !important;
+}
+
 .font-bright-red {
     color: #fb665b;
 }

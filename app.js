@@ -107,20 +107,7 @@ app.use((req, res, next) => {
   res.locals.user = req.user;
   next();
 });
-// app.use((req, res, next) => {
-//   // After successful login, redirect back to the intended page
-//   if (!req.user &&
-//     req.path !== '/login' &&
-//     req.path !== '/signup' &&
-//     !req.path.match(/^\/auth/) &&
-//     !req.path.match(/\./)) {
-//     req.session.returnTo = req.originalUrl;
-//   } else if (req.user &&
-//     (req.path === '/account' || req.path.match(/^\/api/))) {
-//     req.session.returnTo = req.originalUrl;
-//   }
-//   next();
-// });
+
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
 /**
@@ -128,29 +115,13 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
  */
 app.get('/', homeController.index);
 app.get('/qrScanner', homeController.qrScanner);
-// app.get('/login', userController.getLogin);
-// app.post('/login', userController.postLogin);
-// app.get('/logout', userController.logout);
-// app.get('/forgot', userController.getForgot);
-// app.post('/forgot', userController.postForgot);
-// app.get('/reset/:token', userController.getReset);
-// app.post('/reset/:token', userController.postReset);
-// app.get('/signup', userController.getSignup);
-// app.post('/signup', userController.postSignup);
 app.get('/contact', contactController.getContact);
 app.post('/contact', contactController.postContact);
 
 app.post('/occupyRamp/:id', rampController.occupyRamp);
 app.post('/freeRamp/:id', rampController.freeRamp);
 app.get('/rampOccupied/:id', rampController.rampOccupied);
-
-/**
- * OAuth authentication routes. (Sign in)
- */
-// app.get('/auth/google', passport.authenticate('google', { scope: 'profile email' }));
-// app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
-//   res.redirect(req.session.returnTo || '/');
-// });
+app.post('/addToWaitingList/:id', rampController.addToWaitingList);
 
 /**
  * Error Handler.
