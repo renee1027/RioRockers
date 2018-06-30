@@ -60,7 +60,9 @@ function setWaitingList(rampId) {
     data: { _csrf : csrftoken },
     success: function(data) {
       data.ramps.map(ramp => {
-        $('#waitingList_' + ramp.id).text(ramp.waitingList + ' people waiting');
+        if (ramp.occupiedSince || ramp.waitingList > 0) {
+          $('#waitingList_' + ramp.id).text(ramp.waitingList + ' people waiting');
+        }
       })
     }
   });
