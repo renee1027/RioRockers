@@ -52,6 +52,20 @@ function addToWaitingList(rampId) {
   });
 }
 
+function setWaitingList(rampId) {
+  $.ajax({
+    url: '/getNumPeopleWaiting/' + rampId,
+    type: 'GET',
+    crossDomain: true,
+    data: { _csrf : csrftoken },
+    success: function(data) {
+      data.ramps.map(ramp => {
+        $('#waitingList_' + ramp.id).text(ramp.waitingList + ' people waiting');
+      })
+    }
+  });
+}
+
 function generateTimeBarChart(locationId) {
   var chart = c3.generate({
     bindto: '#chart' + locationId,
@@ -127,6 +141,7 @@ function initAutocomplete() {
       return function () {
         locationInfoWindow.setContent(content);
         locationInfoWindow.open(map, this);
+        setWaitingList(location.id);
         generateTimeBarChart(location.id);
       };
     })(locationMarker, content, locationInfoWindow));

@@ -122,6 +122,7 @@ app.post('/occupyRamp/:id', rampController.occupyRamp);
 app.post('/freeRamp/:id', rampController.freeRamp);
 app.get('/rampOccupied/:id', rampController.rampOccupied);
 app.post('/addToWaitingList/:id', rampController.addToWaitingList);
+app.get('/getNumPeopleWaiting/:id', rampController.getNumPeopleWaiting);
 
 /**
  * Error Handler.

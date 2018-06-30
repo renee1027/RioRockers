@@ -82,3 +82,18 @@ exports.addToWaitingList = (req, res) => {
         throw new Error(err);
     });
 }
+
+exports.getNumPeopleWaiting = (req, res) => {
+    return db.Location.findOne({
+        where: {
+            id: req.params.id
+        },
+        include: [db.Ramp]
+    }).then(function(location) {
+        res.status(200).send({ ramps: location.Ramps });
+    }).catch(function (err) {
+        console.log(err);
+        res.sendStatus(500)
+        throw new Error(err);
+    });
+}
