@@ -13,14 +13,10 @@ const dotenv = require('dotenv');
 const flash = require('express-flash');
 const path = require('path');
 const rfs = require('rotating-file-stream');
-const Sequelize = require('sequelize');
 // initalize sequelize with session store
-const passport = require('passport');
 const expressValidator = require('express-validator');
 const expressStatusMonitor = require('express-status-monitor');
 const sass = require('node-sass-middleware');
-const multer = require('multer');
-const upload = multer({ dest: path.join(__dirname, 'uploads') });
 
 // Set up logging directory
 var logDirectory = path.join(__dirname, 'log');
@@ -39,14 +35,7 @@ dotenv.load({ path: '.env' });
  */
 const homeController = require('./controllers/home');
 const rampController = require('./controllers/ramp');
-// const userController = require('./controllers/user');
-// const apiController = require('./controllers/api');
 const contactController = require('./controllers/contact');
-
-/**
- * API keys and Passport configuration.
- */
-// const passportConfig = require('./config/passport');
 
 /**
  * Create Express server.
@@ -90,8 +79,6 @@ app.use(session({
   cookie: { maxAge: 1209600000 },
   proxy: true
 }));
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(flash());
 app.use((req, res, next) => {
   if (req.path === '/api/upload') {
