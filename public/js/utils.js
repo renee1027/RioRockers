@@ -60,18 +60,30 @@ function generateTimeBarChart(locationId) {
       width: 200
     },
     data: {
-        columns: [
-            ['data1', 30, 200, 100, 400, 150, 250],
-            ['data2', 130, 100, 140, 200, 150, 50]
-        ],
-        type: 'bar'
+      columns: [
+          ['bookings', 3, 5, 12, 12, 10, 4, 3, 4]
+      ],
+      type: 'bar',
+      labels: true
+    },
+    axis: {
+      x: {
+        type: 'category',
+        categories: ['0-3', '3-6', '6-9', '9-12', '12-15', '15-18', '18-21',
+          '21-24'],
+        tick: {
+          rotate: 70,
+          multiline: false
+        }
+      },
+      y: {
+        show: false
+      }
     },
     bar: {
         width: {
-            ratio: 0.5 // this makes bar width 50% of length between ticks
+            ratio: 0.7 // this makes bar width 50% of length between ticks
         }
-        // or
-        //width: 100 // this makes bar width 100px
     }
   });
 }
