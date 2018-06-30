@@ -61,7 +61,7 @@ function generateTimeBarChart(locationId) {
     },
     data: {
       columns: [
-          ['bookings', 3, 5, 12, 12, 10, 4, 3, 4]
+          ['Average Occupancies', 3, 5, 12, 12, 10, 4, 3, 4]
       ],
       type: 'bar',
       labels: true
@@ -82,7 +82,7 @@ function generateTimeBarChart(locationId) {
     },
     bar: {
         width: {
-            ratio: 0.7 // this makes bar width 50% of length between ticks
+            ratio: 0.7
         }
     }
   });
